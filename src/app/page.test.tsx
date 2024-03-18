@@ -2,7 +2,7 @@ import { render } from "@testing-library/react";
 import Home from "./page";
 
 describe("Home", () => {
-  it("renders correctly", () => {
+  it("renders succesfully", () => {
     render(<Home />);
   });
 });
