@@ -1,0 +1,60 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  Lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js version 19
+        uses: actions/setup-node@v3
+        with:
+          node-version: "19.x"
+      - run: yarn install
+      - run: yarn build
+      - run: yarn lint
+
+  Security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js version 19
+        uses: actions/setup-node@v3
+        with:
+          node-version: "19.x"
+      - run: npm install
+      - name: Run check for vulnerabilities
+        run: npm audit
+
+  Unit-Test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js version 19
+        uses: actions/setup-node@v3
+        with:
+          node-version: "19.x"
+      - run: yarn install
+      - run: yarn test
+
+  Coverage:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: Use Node.js version 19
+        uses: actions/setup-node@v3
+        with:
+          node-version: "19.x"
+      - run: yarn install
+      - run: yarn test:cov-report
+      - name: Generate test coverage report
+        uses: ArtiomTr/jest-coverage-report-action@v2
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          skip-step: all
+          threshold: 80
